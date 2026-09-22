@@ -1,0 +1,12 @@
+name: activesgm-cu117
+channels:
+  - conda-forge
+dependencies:
+  - python=3.8
+  - cmake=3.26
+  - ninja=1.11
+  - git=2.45
+  - pip=24.0
+  - pip:
+      - -r requirements-repro.txt
+
