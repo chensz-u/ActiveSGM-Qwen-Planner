@@ -60,5 +60,22 @@ class ThirdPartyContractTests(unittest.TestCase):
         self.assertNotRegex(script, r"checkout\s+[^\n]*\b(main|master|dev)\b")
 
 
+class SmokeContractTests(unittest.TestCase):
+    def test_mapping_smoke_is_limited_and_inherits_office0_config(self):
+        config = (ROOT / "configs/Replica/office0/ActiveSemSmoke.py").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn('_base_ = "./ActiveSem.py"', config)
+        self.assertRegex(config, r"num_iter\s*=\s*20\b")
+        self.assertIn("ACTIVESGM_DATA_ROOT", config)
+
+    def test_smoke_launchers_are_repository_relative(self):
+        launcher = (ROOT / "scripts/repro/smoke_office0.sh").read_text(encoding="utf-8")
+        qwen = (ROOT / "scripts/repro/smoke_qwen.py").read_text(encoding="utf-8")
+        self.assertIn('REPO_ROOT="$(cd -- "${SCRIPT_DIR}/../.." && pwd)"', launcher)
+        self.assertIn("resolve_qwen_model_path", qwen)
+        self.assertNotRegex(launcher, r"/home/[^/$\s]+|/data/run01/")
+
+
 if __name__ == "__main__":
     unittest.main()
