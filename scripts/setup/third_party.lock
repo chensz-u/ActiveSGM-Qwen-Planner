@@ -1,0 +1,10 @@
+# name|repository|commit|destination
+coslam|https://github.com/HengyiWang/Co-SLAM.git|3bb904e1c01bb3fd238a279e5ed3cdd291bb23b7|third_parties/coslam
+neural_slam_eval|https://github.com/JingwenWang95/neural_slam_eval.git|9f07a513f647291d5523b8202ac07e9471803d78|third_parties/neural_slam_eval
+splatam|https://github.com/spla-tam/SplaTAM.git|da6bbcd24c248dc884ac7f49d62e91b841b26ccc|third_parties/splatam
+channel_rasterization|https://github.com/lly00412/semantic-gaussians.git|087fb9ed5ab43e0f2d6953340103eb311babf9a0|third_parties/channel_rasterization
+sparse_channel_rasterization|https://github.com/lly00412/semantic-gaussians.git|fe8d7f0478a93a7bc7c6e69571cbb53571473fc9|third_parties/sparse_channel_rasterization
+habitat_sim|https://github.com/Huangying-Zhan/habitat-sim.git|0b7c71722c5dc707fb63dbfd55402abc0b915456|third_parties/habitat_sim
+pytorch3d|https://github.com/facebookresearch/pytorch3d.git|05cbea115acbbcbea77999c03d55155b23479991|third_parties/pytorch3d
+tiny_cuda_nn|https://github.com/NVlabs/tiny-cuda-nn.git|749dd70c5afc5a9dadb85e5652ed65d55e0ba187|third_parties/tiny-cuda-nn
+diff_gaussian_rasterization|https://github.com/JonathonLuiten/diff-gaussian-rasterization-w-depth.git|cb65e4b86bc3bd8ed42174b72a62e8d3a3a71110|third_parties/diff-gaussian-rasterization-w-depth

@@ -34,5 +34,31 @@ class EnvironmentContractTests(unittest.TestCase):
         self.assertNotRegex(installer, r"https?_proxy=")
 
 
+class ThirdPartyContractTests(unittest.TestCase):
+    def test_lock_file_uses_https_urls_and_immutable_commits(self):
+        lock_path = ROOT / "scripts/setup/third_party.lock"
+        entries = [
+            line.split("|")
+            for line in lock_path.read_text(encoding="utf-8").splitlines()
+            if line and not line.startswith("#")
+        ]
+        self.assertGreaterEqual(len(entries), 6)
+        for entry in entries:
+            self.assertEqual(4, len(entry))
+            name, url, commit, destination = entry
+            self.assertRegex(name, r"^[a-z0-9_-]+$")
+            self.assertRegex(url, r"^https://github\.com/.+\.git$")
+            self.assertRegex(commit, r"^[0-9a-f]{40}$")
+            self.assertRegex(destination, r"^third_parties/[A-Za-z0-9_.-]+$")
+
+    def test_bootstrap_refuses_unsafe_existing_directories(self):
+        script = (ROOT / "scripts/setup/bootstrap_third_parties.sh").read_text(encoding="utf-8")
+        self.assertIn('[[ ! -d "${destination}/.git" ]]', script)
+        self.assertIn('git -C "${destination}" diff --quiet', script)
+        self.assertIn('git -C "${destination}" diff --cached --quiet', script)
+        self.assertIn('git -C "${destination}" checkout --detach "${commit}"', script)
+        self.assertNotRegex(script, r"checkout\s+[^\n]*\b(main|master|dev)\b")
+
+
 if __name__ == "__main__":
     unittest.main()

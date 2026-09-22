@@ -7,6 +7,3 @@ dependencies:
   - ninja=1.11
   - git=2.45
   - pip=24.0
-  - pip:
-      - -r requirements-repro.txt
-
