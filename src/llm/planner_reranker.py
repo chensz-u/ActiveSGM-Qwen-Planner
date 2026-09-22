@@ -3,6 +3,8 @@ import os
 import re
 import traceback
 
+from src.llm.runtime_paths import resolve_qwen_model_path
+
 
 _QWEN_TOKENIZER = None
 _QWEN_MODEL = None
@@ -51,10 +53,7 @@ def _get_qwen_model():
     import torch
     from transformers import AutoTokenizer, AutoModelForCausalLM
 
-    model_path = os.environ.get(
-        "QWEN_PLANNER_MODEL_PATH",
-        "/data/run01/scxj889/models/Qwen2.5-1.5B-Instruct",
-    )
+    model_path = str(resolve_qwen_model_path())
 
     print(f"[QWEN-PLANNER] loading tokenizer from {model_path}", flush=True)
     tok = AutoTokenizer.from_pretrained(

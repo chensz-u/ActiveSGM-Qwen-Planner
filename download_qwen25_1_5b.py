@@ -1,13 +1,7 @@
-from huggingface_hub import snapshot_download
+"""Backward-compatible entry point for the safe model downloader."""
 
-model_id = "Qwen/Qwen2.5-1.5B-Instruct"
-local_dir = "/data/run01/scxj889/models/Qwen2.5-1.5B-Instruct"
+from scripts.setup.download_qwen import main
 
-snapshot_download(
-    repo_id=model_id,
-    local_dir=local_dir,
-    local_dir_use_symlinks=False,
-    resume_download=True,
-)
 
-print("Downloaded to:", local_dir)
+if __name__ == "__main__":
+    raise SystemExit(main())
