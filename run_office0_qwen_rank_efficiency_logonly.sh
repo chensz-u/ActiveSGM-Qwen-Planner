@@ -5,12 +5,10 @@
 #SBATCH --cpus-per-task=6
 #SBATCH -t 05:00:00
 
-source ~/run/miniconda3/etc/profile.d/conda.sh
-conda activate activegamer
-
-cd /data/run01/scxj889/projects/ActiveSGM_qwen_planner
-
-export PYTHONPATH=/data/run01/scxj889/qwen_pydeps:$PYTHONPATH
+: "${CONDA_PREFIX:?Activate the activesgm-cu117 environment before submitting this job}"
+REPO_ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+cd "${REPO_ROOT}"
+export PYTHONPATH="${REPO_ROOT}${PYTHONPATH:+:${PYTHONPATH}}"
 
 export CUDA_HOME=$CONDA_PREFIX
 export PATH=$CUDA_HOME/bin:$PATH
@@ -31,7 +29,7 @@ export WANDB_SILENT=true
 # but does NOT allow Qwen to change final_next_visit.
 export ACTIVE_SGM_LLM_MODE=qwen_rank_efficiency_logonly
 
-export QWEN_PLANNER_MODEL_PATH=/data/run01/scxj889/models/Qwen2.5-1.5B-Instruct
+: "${QWEN_PLANNER_MODEL_PATH:?Set QWEN_PLANNER_MODEL_PATH before submitting this job}"
 export QWEN_PLANNER_DTYPE=float32
 export QWEN_PLANNER_TOP_N=3
 export QWEN_PLANNER_TIE_GAP=0.10

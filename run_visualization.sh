@@ -19,12 +19,9 @@ echo "GPU设备 (GPUs): $gpus"
 echo "启用可视化 (Enable Visualization): $enable_vis"
 echo "=========================================="
 
-# 激活 conda 环境
-source /home/chen/miniconda3/etc/profile.d/conda.sh
-conda activate activegamer
-
-# 进入项目目录
-cd /home/chen/Desktop/ActiveSGM
+# 使用调用者已激活的环境，并从脚本位置解析项目目录。
+REPO_ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+cd "${REPO_ROOT}"
 
 # Reduce allocator fragmentation on 8GB GPUs.
 export PYTORCH_CUDA_ALLOC_CONF=${PYTORCH_CUDA_ALLOC_CONF:-max_split_size_mb:64,expandable_segments:True}

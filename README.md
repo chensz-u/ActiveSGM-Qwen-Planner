@@ -58,6 +58,25 @@ dump.
 More context, exact run statistics, limitations, and next steps are in
 [docs/PROJECT_PROGRESS.md](docs/PROJECT_PROGRESS.md).
 
+## Reproducible Setup
+
+The supported target is **Ubuntu 20.04 with an NVIDIA GPU and CUDA 11.7**.
+The setup is intentionally staged so failures are attributable:
+
+```bash
+bash scripts/setup/install_environment.sh
+conda activate activesgm-cu117
+bash scripts/setup/bootstrap_third_parties.sh --build
+python scripts/setup/download_qwen.py
+python scripts/repro/check_environment.py
+python scripts/repro/smoke_qwen.py
+bash scripts/repro/smoke_office0.sh
+```
+
+Set `ACTIVESGM_DATA_ROOT` and `QWEN_PLANNER_MODEL_PATH` before the smoke
+commands. See [QUICK_START.md](QUICK_START.md) for the required data layout,
+license boundaries, and verification levels.
+
 ## Repository Contents
 
 - `src/`: ActiveSGM pipeline, Qwen planner, reranker, visualization, and data
@@ -74,8 +93,13 @@ More context, exact run statistics, limitations, and next steps are in
 This repository deliberately contains source code and compact documentation
 only. It does **not** redistribute third-party source trees, datasets, model
 weights, checkpoints, full experiment outputs, caches, logs, or local
-environments. See `envs/` and the run scripts for setup requirements. The
-baseline data preparation follows the original ActiveSGM/Habitat instructions.
+environments. Third-party repositories are fetched from public upstream URLs
+at commits recorded in `scripts/setup/third_party.lock`; their original
+licenses remain applicable.
+
+Local unit tests and source checks do not prove that CUDA extensions or the
+mapping pipeline work on a new server. Those claims require the Qwen and
+`office0` smoke commands on the supported Linux/GPU target.
 
 For a first baseline run, the repository also retains the lightweight framework
 wrappers under `scripts/framework/`.

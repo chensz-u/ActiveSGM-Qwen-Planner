@@ -6,8 +6,10 @@ from pathlib import Path
 import torch
 from transformers import AutoTokenizer, AutoModelForCausalLM
 
+from src.llm.runtime_paths import resolve_qwen_model_path
 
-MODEL_PATH = "/data/run01/scxj889/models/Qwen2.5-1.5B-Instruct"
+
+MODEL_PATH = str(resolve_qwen_model_path())
 
 BASE = Path(
     "results/Replica/office0/ActiveSem/"

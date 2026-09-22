@@ -1,192 +1,97 @@
-# ActiveSGM 快速启动指南 (RTX 4060 本地运行)
+# Ubuntu 20.04 / CUDA 11.7 快速开始
 
-## ✅ 系统状态
+本指南面向 NVIDIA GPU 服务器。当前仓库不包含数据集、模型权重、第三方源码或检查点；这些内容由脚本获取或由使用者按许可证自行准备。
 
-系统已基本修复完毕，能够成功初始化并进入 mapping iteration。还有一个梯度形状问题需要解决（非阻塞性）。
-
----
-
-## 运行命令
-
-### 方法 1: 直接运行（推荐）
-
-
-source /home/chen/miniconda3/etc/profile.d/conda.sh
-conda activate activegamer
-cd /home/chen/Desktop/ActiveSGM
-export PYTORCH_CUDA_ALLOC_CONF=max_split_size_mb:64,expandable_segments:True
-python src/main/sgm_launcher.py --dataset Replica --scene office0 --exp ActiveSem4060Vis --gpus 0 --enable_vis 1
-
-
-
-
-
-
-
+## 1. 克隆与创建环境
 
 ```bash
-source /home/chen/miniconda3/etc/profile.d/conda.sh
-conda activate activegamer
-cd /home/chen/Desktop/ActiveSGM
-
-# 基础运行（无可视化）
-python src/main/activesgm.py \
-  --cfg configs/Replica/office0/ActiveSem.py \
-  --seed 0 \
-  --result_dir results/Replica/office0/ActiveSem/run_0 \
-  --enable_vis 0
+git clone https://github.com/chensz-u/ActiveSGM-Qwen-Planner.git
+cd ActiveSGM-Qwen-Planner
+bash scripts/setup/install_environment.sh
+conda activate activesgm-cu117
 ```
 
-### 方法 2: 使用启动脚本
+安装脚本固定 Python 3.8、PyTorch 1.13.1 + CUDA 11.7，以及与本项目兼容的 OpenMMLab 1.x 依赖。不要再同时安装 `mmcv 2.x`。
+
+## 2. 获取并构建第三方依赖
 
 ```bash
-cd /home/chen/Desktop/ActiveSGM
-bash run_visualization.sh office0 ActiveSem 0 0
+bash scripts/setup/bootstrap_third_parties.sh
+bash scripts/setup/bootstrap_third_parties.sh --build
 ```
 
-### 方法 3: 使用 tmux（后台运行，推荐用于长时间任务）
+脚本按照 `scripts/setup/third_party.lock` 的提交号获取公开上游代码。如果目标目录不是 Git 仓库或含有未提交修改，脚本会停止，不会覆盖它。
+
+## 3. 准备 Qwen 模型
+
+默认下载到仓库中已被 Git 忽略的 `models/`：
 
 ```bash
-tmux new-session -d -s activesgm
-tmux send-keys -t activesgm "source /home/chen/miniconda3/etc/profile.d/conda.sh && conda activate activegamer && python src/main/activesgm.py --cfg configs/Replica/office0/ActiveSem.py --seed 0 --result_dir results/Replica/office0/ActiveSem/run_0 --enable_vis 0" Enter
-
-# 查看运行状态
-tmux attach -t activesgm
-
-# 退出 (Ctrl+B, D)
+python scripts/setup/download_qwen.py
+export QWEN_PLANNER_MODEL_PATH="$PWD/models/Qwen2.5-1.5B-Instruct"
 ```
 
----
-
-## 关键配置参数
-
-| 参数 | 值 | 说明 |
-|------|-----|------|
-| `desired_image_height` | 340 | 输入图像高度 |
-| `desired_image_width` | 600 | 输入图像宽度 |
-| `mapping_window_size` | 4 | 映射窗口（帧数） |
-| `tracking_iters` | 5 | 跟踪迭代次数 |
-| `mapping_iters` | 5 | 映射迭代次数 |
-| `num_topk_logits` | 16 | 语义 channel 数量 |
-| `map_every` | 5 | 每 N 帧进行一次映射 |
-
----
-
-## 输出目录结构
-
-```
-results/Replica/office0/ActiveSem/run_0/
-├── splatam/
-│   ├── config.py                 # SLAM 配置复制
-│   ├── params0.npz               # 初始高斯参数（可选）
-│   └── params100.npz             # 第 100 步检查点
-├── metrics.json                  # 评估指标
-└── splatam_recon.ply             # 最终 3D 重建点云
-```
-
----
-
-## 预期运行时间
-
-| 阶段 | 时间 | 说明 |
-|------|------|------|
-| 初始化 | ~30 秒 | 加载模型、数据集、编译 CUDA |
-| Habitat 模拟 | ~2 秒/帧 | 单帧渲染 |
-| SLAM（tracking） | ~5 秒/帧 | 相机跟踪（5 iter） |
-| SLAM（mapping） | ~30 秒 | 每 5 帧 1 次，mapping_window_size=4 |
-| **总计** | **~5-10 分钟/100 帧** | 取决于系统负载 |
-
----
-
-## 性能监控
-
-### 实时查看 GPU 使用
+如果模型放在其他磁盘：
 
 ```bash
-watch -n 1 nvidia-smi
+export QWEN_PLANNER_MODEL_PATH=/srv/models/Qwen2.5-1.5B-Instruct
 ```
 
-预期显存占用: **6-7.5 GB** （RTX 4060 8GB 总量）
+需要 Hugging Face 凭据时，只在当前终端设置 `HF_TOKEN`。不要把 token 写进 `.env`、脚本或提交记录。
 
-### 查看运行日志
+## 4. 准备 Replica 数据
+
+请遵守 Replica/Habitat 的原始许可证。将数据整理为：
+
+```text
+<ACTIVESGM_DATA_ROOT>/
+├── Replica/office0/
+├── replica_v1/office_0/habitat/
+└── replica_sim_nvs/
+```
+
+然后设置：
 
 ```bash
-# 如果在 tmux 中运行，直接查看即可
-# 如果后台运行，使用：
-tail -f results/Replica/office0/ActiveSem/run_0/log.txt
+export ACTIVESGM_DATA_ROOT=/srv/datasets/activesgm
 ```
 
----
+Matterport3D 等受许可限制的数据不由本仓库自动下载或再分发。
 
-## 常见问题
+## 5. 分层检查
 
-### Q1: "CUDA out of memory"
-**解决方案**:
-```python
-# 进一步降低参数：
-mapping_window_size = 2
-desired_image_height = 256
-desired_image_width = 512
-mapping_iters = 3
-```
-
-### Q2: "tensor dimension mismatch"
-**解决方案**: 确保 habitat.py 和 ActiveSem.py 的分辨率一致
-```bash
-# 检查
-grep "resolution_hw" configs/Replica/office0/habitat.py
-grep "desired_image" configs/Replica/office0/ActiveSem.py
-```
-
-### Q3: 模型加载缓慢
-**解决方案**: 这是正常的，首次加载 OneFormer 模型需要 2-3 分钟。模型会被缓存到：
-```
-~/.cache/huggingface/hub/
-```
-
-### Q4: 进程卡在 "Mapping Time Step"
-**解决方案**: 
-- 让其继续运行（可能在做 GPU 计算）
-- 或按 `Ctrl+C` 中断并检查错误
-
----
-
-## 实验评估
-
-运行完成后，可以生成评估指标：
+先检查依赖和资产：
 
 ```bash
-# 3D 重建评估
-bash scripts/evaluation/eval_replica_3d.sh office0 1 ActiveSem 0 0
-
-# 语义分割评估
-bash scripts/evaluation/eval_replica_semantic.sh office0 1 ActiveSem 0 0 0 final
-
-# 新视角合成评估
-bash scripts/evaluation/eval_replica_nvs_result.sh office0 1 ActiveSem 0 0
+python scripts/repro/check_environment.py
 ```
 
----
+再检查本地 Qwen 能否输出结构化结果：
 
-## 下一步
+```bash
+python scripts/repro/smoke_qwen.py
+```
 
-### 如果想在服务器上运行
-1. 参考 `SERVER_DEPLOYMENT_PLAN.md`
-2. 建议租赁 RTX 4090 × 2 以加快训练
-3. 预计成本：¥20-30 / 4-5 小时
+最后运行 20 步 `office0` 的 Qwen log-only 主流程：
 
-### 如果想修改参数
-1. 编辑 `configs/Replica/office0/ActiveSem.py`
-2. 或新建场景配置文件
-3. 重新运行命令
+```bash
+bash scripts/repro/smoke_office0.sh
+```
 
-### 如果想进行实验
-1. 尝试不同场景：office1, office2, room0, room1, room2
-2. 调整 planner 策略（active_gsv2 vs predefined_traj）
-3. 对比不同的 SLAM 参数
+该脚本固定 `ACTIVE_SGM_LLM_APPLY=0`，不会让未经验证的 Qwen 决策直接替换 ActiveSGM 轨迹。
 
----
+## 6. 发布前检查
 
-**最后更新**: 2026-04-14
-**系统版本**: v0.1-rtc-4060-optimized
-**维护者**: Your Name
+```bash
+python -m unittest discover -s tests -v
+python -m compileall -q src scripts tests configs
+python scripts/repro/security_scan.py
+```
+
+安全扫描会检查已跟踪文件中的常见凭据、旧机器路径、固定代理和超过 10 MiB 的文件。
+
+## 验证边界
+
+- Windows 可以验证 Python 语法、路径逻辑、单元测试和安全扫描。
+- Ubuntu 20.04/CUDA 11.7 才能验证 Habitat、CUDA 扩展、Qwen 加载和 ActiveSGM 冒烟运行。
+- 20 步冒烟通过仅代表安装链路可工作，不代表完整 2000 步实验或论文指标已经复现。

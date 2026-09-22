@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-source /home/chen/miniconda3/etc/profile.d/conda.sh
-conda activate activegamer
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd -- "${SCRIPT_DIR}/../.." && pwd)"
+cd "${REPO_ROOT}"
 
 python - <<'PY'
 import importlib.util as u

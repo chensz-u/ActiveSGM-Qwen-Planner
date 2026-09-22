@@ -23,7 +23,23 @@ PATTERNS = (
     ("hf-token", re.compile(r"hf_" + r"[A-Za-z0-9]{20,}")),
     ("github-token", re.compile(r"gh[pousr]_" + r"[A-Za-z0-9]{30,}")),
     ("aws-key", re.compile(r"AKIA" + r"[A-Z0-9]{16}")),
-    ("personal-path", re.compile(r"/data/run01/" + r"scxj889|/home/chen(?:/|\b)|~/run/miniconda3")),
+    (
+        "personal-path",
+        re.compile(
+            r"/data/run01/"
+            + r"scxj889|/home/"
+            + r"chen(?:/|\b)|~/run/"
+            + r"miniconda3|/mnt/"
+            + r"Data\d+/"
+        ),
+    ),
+    (
+        "private-endpoint",
+        re.compile(
+            r"[A-Za-z0-9._-]+@"
+            + r"(?:10(?:\.\d{1,3}){3}|192\.168(?:\.\d{1,3}){2}|172\.(?:1[6-9]|2\d|3[01])(?:\.\d{1,3}){2}):"
+        ),
+    ),
     ("fixed-proxy", re.compile(r"172\.24\.206\.4:3128")),
 )
 

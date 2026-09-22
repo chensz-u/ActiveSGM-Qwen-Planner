@@ -68,7 +68,7 @@ do
         --ckpt ${result_dir}/splatam/${step}/params.npz \
         --gt_mesh ${GT_MESH} \
         --transform_traj data/Replica/${scene}/traj.txt \
-        --result_dir ${result_dir}/splatam/eval_${step}/eval_3d/ \
+        --result_dir ${result_dir}/splatam/eval_${step}/eval_3d/
     done
 done
 

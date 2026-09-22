@@ -5,12 +5,11 @@
 #SBATCH --cpus-per-task=4
 #SBATCH -t 00:20:00
 
-source ~/run/miniconda3/etc/profile.d/conda.sh
-conda activate activegamer
-
-cd /data/run01/scxj889/projects/ActiveSGM_qwen_planner
-
-export PYTHONPATH=/data/run01/scxj889/qwen_pydeps:$PYTHONPATH
+: "${CONDA_PREFIX:?Activate the activesgm-cu117 environment before submitting this job}"
+REPO_ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+cd "${REPO_ROOT}"
+export PYTHONPATH="${REPO_ROOT}${PYTHONPATH:+:${PYTHONPATH}}"
+: "${QWEN_PLANNER_MODEL_PATH:?Set QWEN_PLANNER_MODEL_PATH before submitting this job}"
 export TRANSFORMERS_OFFLINE=1
 export HF_HUB_OFFLINE=1
 export CUDA_DEVICE_ORDER=PCI_BUS_ID
@@ -26,11 +25,12 @@ echo "CUDA_VISIBLE_DEVICES=$CUDA_VISIBLE_DEVICES"
 
 python - <<'PY'
 import json
+import os
 import re
 import torch
 from transformers import AutoTokenizer, AutoModelForCausalLM
 
-model_path = "/data/run01/scxj889/models/Qwen2.5-1.5B-Instruct"
+model_path = os.environ["QWEN_PLANNER_MODEL_PATH"]
 
 print("torch:", torch.__version__)
 print("cuda available:", torch.cuda.is_available())

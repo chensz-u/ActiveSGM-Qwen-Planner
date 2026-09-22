@@ -1,8 +1,8 @@
 JobID: 477297
 Branch: feature_qwen25_15b_planner_v1
 Base ActiveSGM environment: activegamer
-Qwen dependency overlay: /data/run01/scxj889/qwen_pydeps
-Model: /data/run01/scxj889/models/Qwen2.5-1.5B-Instruct
+Qwen dependency source: pinned reproducibility environment
+Model: configured by QWEN_PLANNER_MODEL_PATH
 Script: test_qwen_planner_json_v2.sh
 
 Purpose:
@@ -14,7 +14,7 @@ COMPLETED, ExitCode 0:0, Elapsed 00:03:26.
 Environment:
 Python: /data/home/scxj889/run/conda_envs/activegamer/bin/python
 Torch: 1.13.1+cu117
-Transformers: 4.45.2 from /data/run01/scxj889/qwen_pydeps
+Transformers: 4.45.2
 GPU: RTX 4090
 
 Result:

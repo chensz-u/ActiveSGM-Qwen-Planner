@@ -42,6 +42,22 @@ class SecurityScannerTests(unittest.TestCase):
             findings = scan_paths([path])
         self.assertTrue(any(item.kind == "personal-path" for item in findings))
 
+    def test_scanner_detects_private_ssh_endpoint_and_named_mount(self):
+        from scripts.repro.security_scan import scan_paths
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            path = Path(temp_dir) / "remote.sh"
+            path.write_text(
+                "rsync "
+                + "researcher@"
+                + "192.168.10.5:/private/results /mnt/"
+                + "Data9/results",
+                encoding="utf-8",
+            )
+            kinds = {item.kind for item in scan_paths([path])}
+        self.assertIn("private-endpoint", kinds)
+        self.assertIn("personal-path", kinds)
+
     def test_scanner_rejects_large_files(self):
         from scripts.repro.security_scan import scan_paths
 

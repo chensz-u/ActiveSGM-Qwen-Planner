@@ -5,13 +5,13 @@
 #SBATCH --cpus-per-task=6
 #SBATCH -t 00:40:00
 
-source ~/run/miniconda3/etc/profile.d/conda.sh
-conda activate activegamer
+: "${CONDA_PREFIX:?Activate the activesgm-cu117 environment before submitting this job}"
 
 export CUDA_DEVICE_ORDER=PCI_BUS_ID
 export CUDA_VISIBLE_DEVICES=0
 
-cd /data/run01/scxj889/projects/ActiveSGM_qwen_planner
+REPO_ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+cd "${REPO_ROOT}"
 
 export CUDA_HOME=$CONDA_PREFIX
 export PATH=$CUDA_HOME/bin:$PATH

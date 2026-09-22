@@ -61,11 +61,11 @@ def save_output_video(vis_path, video_path, H, W, output, near_depth, far_depth)
 
 if __name__ == '__main__':
     # set params ##
-    HOME = "/mnt/Data2/"
-    PROJ_DIR = f"{HOME}/liyan/ActiveGAMER"
+    PROJ_DIR = os.environ.get("ACTIVESGM_REPO_ROOT", os.getcwd())
+    DATA_ROOT = os.environ.get("ACTIVESGM_DATA_ROOT", os.path.join(PROJ_DIR, "data"))
     DATASET = "Replica"
     RESULT_DIR = f'{PROJ_DIR}/results'
-    GT_DATA_DIR = f"{HOME}/slam_datasets/{DATASET}"
+    GT_DATA_DIR = os.path.join(DATA_ROOT, DATASET)
 
     scene = "office4"
     seed = 0

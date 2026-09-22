@@ -6,10 +6,11 @@ exp=${2:-ActiveSem}
 gpus=${3:-0}
 dry_run=${4:-1}
 
-source /home/chen/miniconda3/etc/profile.d/conda.sh
-conda activate activegamer
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd -- "${SCRIPT_DIR}/../.." && pwd)"
+cd "${REPO_ROOT}"
 
-cmd=(python /home/chen/Desktop/ActiveSGM/src/main/sgm_launcher.py \
+cmd=(python "${REPO_ROOT}/src/main/sgm_launcher.py" \
   --dataset Replica \
   --scene "$scene" \
   --exp "$exp" \

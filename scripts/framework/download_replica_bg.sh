@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-REPO=/home/chen/Desktop/ActiveSGM
-PART_DIR=/tmp/replica_parts
-DEST_DIR=$REPO/data/replica_v1_local
-LOG=$REPO/logs/replica_download.log
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+REPO="$(cd -- "${SCRIPT_DIR}/../.." && pwd)"
+PART_DIR="${ACTIVESGM_DOWNLOAD_CACHE:-${TMPDIR:-/tmp}/replica_parts}"
+DEST_DIR="${ACTIVESGM_DATA_ROOT:-${REPO}/data}/replica_v1"
+LOG="${REPO}/logs/replica_download.log"
 
 mkdir -p "$PART_DIR" "$DEST_DIR" "$REPO/assets" "$REPO/logs"
 

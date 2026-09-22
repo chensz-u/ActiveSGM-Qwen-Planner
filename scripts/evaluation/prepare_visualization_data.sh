@@ -1,13 +1,14 @@
 dataset=${1:-MP3D}
 scene=${2:-gZ6f7yhEvPG}
 iter=${3:-5000}
+: "${ACTIVESGM_VIS_SOURCE:?Set ACTIVESGM_VIS_SOURCE to an rsync source root}"
 
 vis_dir=tmp/${dataset}_vis/${scene}
 
 ### Download data
 mkdir -p tmp/${dataset}_vis/${scene}
-rsync -avz us000245@172.24.209.46:/home/us000245/projects/naruto/results/${dataset}/${scene}/NARUTO/run_0/visualization/ tmp/${dataset}_vis/${scene}
-rsync -avz us000245@172.24.209.46:/home/us000245/projects/naruto/results/${dataset}/${scene}/NARUTO/run_0/coslam/mesh/mesh_${iter}_final_cull_occlusion.ply tmp/${dataset}_vis/${scene}/
+rsync -avz "${ACTIVESGM_VIS_SOURCE}/${dataset}/${scene}/NARUTO/run_0/visualization/" "${vis_dir}"
+rsync -avz "${ACTIVESGM_VIS_SOURCE}/${dataset}/${scene}/NARUTO/run_0/coslam/mesh/mesh_${iter}_final_cull_occlusion.ply" "${vis_dir}/"
 
 ### prepare suitable camera viewpoints
 ### visualize trajectory ###

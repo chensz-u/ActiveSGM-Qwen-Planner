@@ -5,12 +5,11 @@
 #SBATCH --cpus-per-task=4
 #SBATCH -t 00:40:00
 
-source ~/run/miniconda3/etc/profile.d/conda.sh
-conda activate activegamer
-
-cd /data/run01/scxj889/projects/ActiveSGM_qwen_planner
-
-export PYTHONPATH=/data/run01/scxj889/qwen_pydeps:$PYTHONPATH
+: "${CONDA_PREFIX:?Activate the activesgm-cu117 environment before submitting this job}"
+REPO_ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+cd "${REPO_ROOT}"
+export PYTHONPATH="${REPO_ROOT}${PYTHONPATH:+:${PYTHONPATH}}"
+: "${QWEN_PLANNER_MODEL_PATH:?Set QWEN_PLANNER_MODEL_PATH before submitting this job}"
 export TRANSFORMERS_OFFLINE=1
 export HF_HUB_OFFLINE=1
 export CUDA_DEVICE_ORDER=PCI_BUS_ID

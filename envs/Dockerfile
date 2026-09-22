@@ -9,12 +9,6 @@ FROM nvidia/cudagl:11.3.1-devel-ubuntu20.04
 ##################################################
 ### ENV and ARG variables
 ##################################################
-ARG http_proxy=http://172.24.206.4:3128
-ARG https_proxy=http://172.24.206.4:3128
-ENV http_proxy=http://172.24.206.4:3128
-ENV https_proxy=http://172.24.206.4:3128
-ENV no_proxy=localhost,127.0.0.1
-
 ENV LC_ALL=C.UTF-8
 ENV LANG=C.UTF-8
 

@@ -1,4 +1,6 @@
 import re
+import shutil
+import subprocess
 import unittest
 from pathlib import Path
 
@@ -75,6 +77,44 @@ class SmokeContractTests(unittest.TestCase):
         self.assertIn('REPO_ROOT="$(cd -- "${SCRIPT_DIR}/../.." && pwd)"', launcher)
         self.assertIn("resolve_qwen_model_path", qwen)
         self.assertNotRegex(launcher, r"/home/[^/$\s]+|/data/run01/")
+
+
+class PersonalPathContractTests(unittest.TestCase):
+    def test_tracked_files_do_not_expose_old_machine_paths(self):
+        from scripts.repro.security_scan import scan_paths, tracked_paths
+
+        findings = [
+            finding
+            for finding in scan_paths(tracked_paths())
+            if finding.kind in {"personal-path", "fixed-proxy"}
+        ]
+        self.assertEqual([], findings, msg="\n".join(str(item.path) for item in findings))
+
+
+class ShellSyntaxTests(unittest.TestCase):
+    def test_all_shell_scripts_parse(self):
+        candidates = [
+            Path(r"C:\Program Files\Git\bin\bash.exe"),
+            Path(r"C:\Program Files\Git\usr\bin\bash.exe"),
+        ]
+        bash = next((str(path) for path in candidates if path.is_file()), None)
+        if bash is None and shutil.which("bash"):
+            probe = subprocess.run(
+                ["bash", "--version"], capture_output=True, text=True, check=False
+            )
+            if probe.returncode == 0:
+                bash = "bash"
+        if bash is None:
+            self.skipTest("Bash is unavailable on this platform")
+
+        failures = []
+        for script in ROOT.rglob("*.sh"):
+            result = subprocess.run(
+                [bash, "-n", str(script)], capture_output=True, text=True, check=False
+            )
+            if result.returncode:
+                failures.append(f"{script.relative_to(ROOT)}: {result.stderr.strip()}")
+        self.assertEqual([], failures, msg="\n".join(failures))
 
 
 if __name__ == "__main__":

@@ -4,7 +4,7 @@
 
 ### 方法 1：使用默认参数运行（推荐）
 ```bash
-cd /home/chen/Desktop/ActiveSGM
+cd /path/to/ActiveSGM-Qwen-Planner
 bash run_visualization.sh
 ```
 
@@ -55,7 +55,7 @@ bash run_visualization.sh office0 ActiveSem 0,1 0
 - hotel_0
 - room_0
 
-数据位置：`/home/chen/Desktop/ActiveSGM/data/replica_v1_local/`
+数据位置：由 `ACTIVESGM_DATA_ROOT` 指定；默认使用仓库内已忽略的 `data/`。
 
 ## 输出文件位置
 
@@ -97,7 +97,7 @@ bash run_visualization.sh office0 ActiveSem 0,1 0
 1. 在 VS Code 中打开终端（Ctrl+`）
 2. 输入命令：
 ```bash
-cd /home/chen/Desktop/ActiveSGM
+cd /path/to/ActiveSGM-Qwen-Planner
 bash run_visualization.sh office0 ActiveSem 0,1 1
 ```
 3. 按 Enter 运行

@@ -2,7 +2,7 @@ ActiveSGM + Qwen Planner Experiment Summary
 ===========================================
 
 Repository:
- /data/run01/scxj889/projects/ActiveSGM_qwen_planner
+ repository root (machine-specific path removed)
 
 Branch:
  feature_qwen25_15b_planner_v1
