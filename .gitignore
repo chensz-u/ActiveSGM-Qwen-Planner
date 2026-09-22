@@ -11,6 +11,9 @@ __pycache__/
 .idea/
 .vscode/
 .codex/
+.env
+.env.*
+!.env.example
 logs/
 results/
 datasets/
@@ -21,7 +24,11 @@ models/
 *.jsonl
 data/Replica/
 data/replica_v1/
+data/replica_sim_nvs/
+data/mp3d_sim_nvs/
 calibration/output/
+.cache/
+wheelhouse/
 
 # Local downloads and generated assets
 assets/*.zip
