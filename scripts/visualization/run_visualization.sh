@@ -2,8 +2,8 @@
 set -euo pipefail
 
 # ActiveSGM 可视化运行脚本
-# 用法: bash run_visualization.sh [scene] [exp] [gpus] [enable_vis]
-# 示例: bash run_visualization.sh office0 ActiveSem4060Vis 0 1
+# 用法: bash scripts/visualization/run_visualization.sh [scene] [exp] [gpus] [enable_vis]
+# 示例: bash scripts/visualization/run_visualization.sh office0 ActiveSem4060Vis 0 1
 
 scene=${1:-office0}
 exp=${2:-ActiveSem4060Vis}

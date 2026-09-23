@@ -94,10 +94,10 @@ class PersonalPathContractTests(unittest.TestCase):
 class RepositoryLayoutTests(unittest.TestCase):
     def test_moved_shell_entry_points_resolve_repository_root(self):
         expectations = {
-            ROOT / "experiments/launchers/online": '${SCRIPT_DIR}/../../..',
-            ROOT / "experiments/launchers/offline": '${SCRIPT_DIR}/../../..',
-            ROOT / "tests/shell": '${SCRIPT_DIR}/../..',
-            ROOT / "scripts/visualization": '${SCRIPT_DIR}/../..',
+            ROOT / "experiments/launchers/online": 'REPO_ROOT="$(cd -- "${SCRIPT_DIR}/../../.." && pwd)"',
+            ROOT / "experiments/launchers/offline": 'REPO_ROOT="$(cd -- "${SCRIPT_DIR}/../../.." && pwd)"',
+            ROOT / "tests/shell": 'REPO_ROOT="$(cd -- "${SCRIPT_DIR}/../.." && pwd)"',
+            ROOT / "scripts/visualization": 'REPO_ROOT="$(cd -- "${SCRIPT_DIR}/../.." && pwd)"',
         }
         for directory, marker in expectations.items():
             scripts = sorted(directory.glob("*.sh"))
