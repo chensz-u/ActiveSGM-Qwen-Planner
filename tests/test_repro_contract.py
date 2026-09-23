@@ -91,6 +91,34 @@ class PersonalPathContractTests(unittest.TestCase):
         self.assertEqual([], findings, msg="\n".join(str(item.path) for item in findings))
 
 
+class RepositoryLayoutTests(unittest.TestCase):
+    def test_experiment_artifacts_do_not_live_at_repository_root(self):
+        forbidden_patterns = (
+            "analysis_*.py",
+            "offline_*.py",
+            "run_office0_*.sh",
+            "run_offline_*.sh",
+            "notes_*.txt",
+            "test_*.sh",
+        )
+        offenders = sorted(
+            path.name
+            for pattern in forbidden_patterns
+            for path in ROOT.glob(pattern)
+            if path.is_file()
+        )
+        self.assertEqual([], offenders)
+
+    def test_navigation_files_exist(self):
+        expected = (
+            ROOT / "PROJECT_MAP.md",
+            ROOT / "experiments/README.md",
+            ROOT / "docs/guides/BASELINE_OFFICE0_SUCCESS.md",
+            ROOT / "docs/guides/VISUALIZATION_GUIDE.md",
+        )
+        self.assertEqual([], [str(path.relative_to(ROOT)) for path in expected if not path.is_file()])
+
+
 class ShellSyntaxTests(unittest.TestCase):
     def test_all_shell_scripts_parse(self):
         candidates = [
