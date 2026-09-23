@@ -1,12 +1,13 @@
 #!/bin/bash
-#SBATCH -J qwen_glv2_unit
+#SBATCH -J qwen_glv3_unit
 #SBATCH -p gpu_4090
 #SBATCH --gpus=1
 #SBATCH --cpus-per-task=4
 #SBATCH -t 00:25:00
 
 : "${CONDA_PREFIX:?Activate the activesgm-cu117 environment before submitting this job}"
-REPO_ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd -- "${SCRIPT_DIR}/../.." && pwd)"
 cd "${REPO_ROOT}"
 export PYTHONPATH="${REPO_ROOT}${PYTHONPATH:+:${PYTHONPATH}}"
 
@@ -23,17 +24,17 @@ export HF_HUB_OFFLINE=1
 export WANDB_MODE=disabled
 export WANDB_SILENT=true
 
-export ACTIVE_SGM_LLM_MODE=qwen_global_local_v2_logonly
+export ACTIVE_SGM_LLM_MODE=qwen_global_local_v3_logonly
 : "${QWEN_PLANNER_MODEL_PATH:?Set QWEN_PLANNER_MODEL_PATH before submitting this job}"
 export QWEN_PLANNER_DTYPE=float32
 export QWEN_PLANNER_TOP_N=3
 export QWEN_PLANNER_TIE_GAP=0.10
 export QWEN_PLANNER_MAX_NEW_TOKENS=128
 
-export QWEN_RANK_EFF_MAX_WEIGHTED_RANK=3
-export QWEN_RANK_EFF_MAX_SCORE_DROP=0.09
-export QWEN_RANK_EFF_MIN_DISTANCE_SAVING=0.8
-export QWEN_RANK_EFF_MIN_STABLE_EFF_RATIO=1.1
+export QWEN_V3_SOFT_MAX_WEIGHTED_RANK=3
+export QWEN_V3_SOFT_MAX_SCORE_DROP=0.09
+export QWEN_V3_SOFT_MIN_DISTANCE_SAVING=0.5
+export QWEN_V3_SOFT_MIN_STABLE_EFF_RATIO=1.0
 
 echo "===== ENV CHECK ====="
 hostname
@@ -81,7 +82,7 @@ res = fake_llm_rerank(candidates, original_next_visit=0)
 print("===== RESULT =====")
 print(json.dumps(res, ensure_ascii=False, indent=2))
 
-assert res["mode"] == "qwen_global_local_v2_logonly"
+assert res["mode"] == "qwen_global_local_v3_logonly"
 assert res["tie_case"] is True
 assert res["qwen_called"] is True
 assert res["guarded_final_id"] == 0
@@ -99,9 +100,10 @@ required_keys = [
     "qwen_should_change_original_raw",
     "should_change_original",
     "global_local_consistency_pass",
-    "global_local_v2_would_accept",
-    "global_local_v2_reject_reason",
-    "rank_efficiency_guard_accept",
+    "global_local_v3_soft_gate_accept",
+    "global_local_v3_would_accept",
+    "global_local_v3_reject_reason",
+    "global_local_v3_thresholds",
 ]
 
 for k in required_keys:
@@ -115,19 +117,19 @@ global_state = gm["global_state"]
 assert global_state["exploration_stage"] == "early"
 assert global_state["candidate_count"] == 3
 
-# v2 consistency invariant:
-# If v2 would accept, all strict conditions must hold.
-if gm["global_local_v2_would_accept"]:
-    assert gm["should_change_original"] is True
+# v3 log-only invariant:
+assert gm["should_change_original"] is False
+
+# If v3 would accept, all soft-consistency conditions must hold.
+if gm["global_local_v3_would_accept"]:
     assert gm["global_local_consistency_pass"] is True
-    assert gm["rank_efficiency_guard_accept"] is True
+    assert gm["global_local_v3_soft_gate_accept"] is True
     assert gm["trajectory_risk"] == "low"
-    assert gm["global_local_alignment"] == "high"
+    assert gm["global_local_alignment"] in ["medium", "high"]
     assert gm["decision_confidence"] in ["medium", "high"]
     assert res["selected_candidate_id"] != 0
 else:
-    assert gm["should_change_original"] is False
     assert gm["global_local_consistency_pass"] is False
 
-print("QWEN_GLOBAL_LOCAL_V2_UNIT_TEST_PASSED")
+print("QWEN_GLOBAL_LOCAL_V3_UNIT_TEST_PASSED")
 PY

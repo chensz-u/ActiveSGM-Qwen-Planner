@@ -6,7 +6,8 @@
 #SBATCH -t 00:40:00
 
 : "${CONDA_PREFIX:?Activate the activesgm-cu117 environment before submitting this job}"
-REPO_ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd -- "${SCRIPT_DIR}/../../.." && pwd)"
 cd "${REPO_ROOT}"
 export PYTHONPATH="${REPO_ROOT}${PYTHONPATH:+:${PYTHONPATH}}"
 : "${QWEN_PLANNER_MODEL_PATH:?Set QWEN_PLANNER_MODEL_PATH before submitting this job}"
@@ -25,4 +26,4 @@ nvidia-smi
 echo "CUDA_VISIBLE_DEVICES=$CUDA_VISIBLE_DEVICES"
 
 echo "===== START OFFLINE QWEN TOPK RERANK ====="
-python offline_qwen_rerank_llm_logs_topk.py
+python experiments/analysis/offline_qwen_rerank_llm_logs_topk.py

@@ -1,12 +1,13 @@
 #!/bin/bash
-#SBATCH -J qwen_rankeff_app2
+#SBATCH -J qwen_glv2_log
 #SBATCH -p gpu_4090
 #SBATCH --gpus=1
 #SBATCH --cpus-per-task=6
 #SBATCH -t 05:00:00
 
 : "${CONDA_PREFIX:?Activate the activesgm-cu117 environment before submitting this job}"
-REPO_ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd -- "${SCRIPT_DIR}/../../.." && pwd)"
 cd "${REPO_ROOT}"
 export PYTHONPATH="${REPO_ROOT}${PYTHONPATH:+:${PYTHONPATH}}"
 
@@ -24,23 +25,25 @@ export HF_HUB_OFFLINE=1
 export WANDB_MODE=disabled
 export WANDB_SILENT=true
 
-# Conservative enhanced-metrics Qwen apply-v2 mode.
-export ACTIVE_SGM_LLM_MODE=qwen_rank_efficiency_apply_v2
-export ACTIVE_SGM_LLM_APPLY=1
+# Stricter global-local Qwen v2 log-only mode.
+# This mode records Qwen's structured global-local judgment,
+# then applies post-hoc consistency checks, but does NOT change trajectory.
+export ACTIVE_SGM_LLM_MODE=qwen_global_local_v2_logonly
+export ACTIVE_SGM_LLM_APPLY=0
 
 : "${QWEN_PLANNER_MODEL_PATH:?Set QWEN_PLANNER_MODEL_PATH before submitting this job}"
 export QWEN_PLANNER_DTYPE=float32
 export QWEN_PLANNER_TOP_N=3
 export QWEN_PLANNER_TIE_GAP=0.10
-export QWEN_PLANNER_MAX_NEW_TOKENS=96
+export QWEN_PLANNER_MAX_NEW_TOKENS=128
 
-# Conservative apply-v2 guard.
+# Conservative deterministic guard metrics are still computed for hypothetical analysis.
 export QWEN_RANK_EFF_MAX_WEIGHTED_RANK=3
 export QWEN_RANK_EFF_MAX_SCORE_DROP=0.09
 export QWEN_RANK_EFF_MIN_DISTANCE_SAVING=0.8
 export QWEN_RANK_EFF_MIN_STABLE_EFF_RATIO=1.1
 
-RESULT_DIR="results/Replica/office0/ActiveSem/run_qwen_rank_efficiency_apply_v2_$(date +%Y%m%d_%H%M%S)"
+RESULT_DIR="results/Replica/office0/ActiveSem/run_qwen_global_local_v2_logonly_$(date +%Y%m%d_%H%M%S)"
 mkdir -p "$RESULT_DIR"
 
 echo "===== ENV CHECK ====="
@@ -52,11 +55,13 @@ python --version
 nvidia-smi
 echo "ACTIVE_SGM_LLM_MODE=$ACTIVE_SGM_LLM_MODE"
 echo "ACTIVE_SGM_LLM_APPLY=$ACTIVE_SGM_LLM_APPLY"
+echo "QWEN_PLANNER_DTYPE=$QWEN_PLANNER_DTYPE"
+echo "QWEN_PLANNER_MAX_NEW_TOKENS=$QWEN_PLANNER_MAX_NEW_TOKENS"
 echo "QWEN_RANK_EFF_MIN_DISTANCE_SAVING=$QWEN_RANK_EFF_MIN_DISTANCE_SAVING"
 echo "QWEN_RANK_EFF_MIN_STABLE_EFF_RATIO=$QWEN_RANK_EFF_MIN_STABLE_EFF_RATIO"
 echo "RESULT_DIR=$RESULT_DIR"
 
-echo "===== START ActiveSGM Qwen Rank-Efficiency APPLY-V2 ====="
+echo "===== START ActiveSGM Qwen Global-Local V2 LOG-ONLY ====="
 
 python src/main/activesgm.py \
   --cfg configs/Replica/office0/ActiveSem_LLMLog.py \

@@ -20,7 +20,8 @@ echo "启用可视化 (Enable Visualization): $enable_vis"
 echo "=========================================="
 
 # 使用调用者已激活的环境，并从脚本位置解析项目目录。
-REPO_ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd -- "${SCRIPT_DIR}/../.." && pwd)"
 cd "${REPO_ROOT}"
 
 # Reduce allocator fragmentation on 8GB GPUs.

@@ -3,10 +3,11 @@
 #SBATCH -p gpu_4090
 #SBATCH --gpus=1
 #SBATCH --cpus-per-task=6
-#SBATCH -t 05:00:00
+#SBATCH -t 01:00:00
 
 : "${CONDA_PREFIX:?Activate the activesgm-cu117 environment before submitting this job}"
-REPO_ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd -- "${SCRIPT_DIR}/../../.." && pwd)"
 cd "${REPO_ROOT}"
 
 export CUDA_HOME=$CONDA_PREFIX
@@ -30,10 +31,10 @@ python --version
 nvidia-smi
 
 echo "===== START ActiveSGM office0 MAIN ONLY ====="
-mkdir -p results/Replica/office0/ActiveSem/run_full_semfix
+mkdir -p results/Replica/office0/ActiveSem/run_semfix
 
 python src/main/activesgm.py \
   --cfg configs/Replica/office0/ActiveSem.py \
   --seed 0 \
-  --result_dir results/Replica/office0/ActiveSem/run_full_semfix \
+  --result_dir results/Replica/office0/ActiveSem/run_semfix \
   --enable_vis 0

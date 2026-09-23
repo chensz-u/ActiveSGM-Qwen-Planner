@@ -92,6 +92,20 @@ class PersonalPathContractTests(unittest.TestCase):
 
 
 class RepositoryLayoutTests(unittest.TestCase):
+    def test_moved_shell_entry_points_resolve_repository_root(self):
+        expectations = {
+            ROOT / "experiments/launchers/online": '${SCRIPT_DIR}/../../..',
+            ROOT / "experiments/launchers/offline": '${SCRIPT_DIR}/../../..',
+            ROOT / "tests/shell": '${SCRIPT_DIR}/../..',
+            ROOT / "scripts/visualization": '${SCRIPT_DIR}/../..',
+        }
+        for directory, marker in expectations.items():
+            scripts = sorted(directory.glob("*.sh"))
+            self.assertTrue(scripts, msg=str(directory.relative_to(ROOT)))
+            for script in scripts:
+                content = script.read_text(encoding="utf-8")
+                self.assertIn(marker, content, msg=str(script.relative_to(ROOT)))
+
     def test_experiment_artifacts_do_not_live_at_repository_root(self):
         forbidden_patterns = (
             "analysis_*.py",

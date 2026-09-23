@@ -1,12 +1,13 @@
 #!/bin/bash
-#SBATCH -J activesgm_qwen_logonly
+#SBATCH -J activesgm_qwen_strict1
 #SBATCH -p gpu_4090
 #SBATCH --gpus=1
 #SBATCH --cpus-per-task=6
 #SBATCH -t 05:00:00
 
 : "${CONDA_PREFIX:?Activate the activesgm-cu117 environment before submitting this job}"
-REPO_ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd -- "${SCRIPT_DIR}/../../.." && pwd)"
 cd "${REPO_ROOT}"
 export PYTHONPATH="${REPO_ROOT}${PYTHONPATH:+:${PYTHONPATH}}"
 
@@ -24,22 +25,20 @@ export HF_HUB_OFFLINE=1
 export WANDB_MODE=disabled
 export WANDB_SILENT=true
 
-# Qwen online log-only mode.
+# Qwen online apply mode.
 export ACTIVE_SGM_LLM_MODE=qwen_tiebreak_top3_distance_strict
+export ACTIVE_SGM_LLM_APPLY=1
+
 : "${QWEN_PLANNER_MODEL_PATH:?Set QWEN_PLANNER_MODEL_PATH before submitting this job}"
-
-# Start with float32 because unit test and offline experiments used this successfully.
-# If full ActiveSGM OOMs, switch this to float16.
 export QWEN_PLANNER_DTYPE=float32
-
 export QWEN_PLANNER_TOP_N=3
 export QWEN_PLANNER_TIE_GAP=0.10
 export QWEN_PLANNER_MIN_WEIGHT_KEEP=0.90
-export QWEN_PLANNER_MIN_EXPLORE_KEEP=0.80
-export QWEN_PLANNER_MAX_DISTANCE_INCREASE=0.0
+export QWEN_PLANNER_MIN_EXPLORE_KEEP=0.90
+export QWEN_PLANNER_MAX_DISTANCE_INCREASE=-0.000001
 export QWEN_PLANNER_MAX_NEW_TOKENS=96
 
-RESULT_DIR="results/Replica/office0/ActiveSem/run_qwen_tiebreak_logonly_$(date +%Y%m%d_%H%M%S)"
+RESULT_DIR="results/Replica/office0/ActiveSem/run_qwen_tiebreak_apply_strict_v1_$(date +%Y%m%d_%H%M%S)"
 mkdir -p "$RESULT_DIR"
 
 echo "===== ENV CHECK ====="
@@ -51,10 +50,11 @@ python --version
 nvidia-smi
 echo "CUDA_VISIBLE_DEVICES=$CUDA_VISIBLE_DEVICES"
 echo "ACTIVE_SGM_LLM_MODE=$ACTIVE_SGM_LLM_MODE"
+echo "ACTIVE_SGM_LLM_APPLY=$ACTIVE_SGM_LLM_APPLY"
 echo "QWEN_PLANNER_DTYPE=$QWEN_PLANNER_DTYPE"
 echo "RESULT_DIR=$RESULT_DIR"
 
-echo "===== START ActiveSGM Qwen Top3 TieBreak online log-only ====="
+echo "===== START ActiveSGM Qwen Top3 TieBreak APPLY ====="
 
 python src/main/activesgm.py \
   --cfg configs/Replica/office0/ActiveSem_LLMLog.py \
