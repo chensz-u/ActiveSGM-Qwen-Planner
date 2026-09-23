@@ -121,7 +121,7 @@ class RepositoryLayoutTests(unittest.TestCase):
             for path in ROOT.glob(pattern)
             if path.is_file()
         )
-        self.assertEqual([], offenders)
+        self.assertEqual([], offenders, msg="\n".join(offenders))
 
     def test_navigation_files_exist(self):
         expected = (
