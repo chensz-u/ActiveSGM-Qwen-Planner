@@ -84,9 +84,12 @@ license boundaries, and verification levels.
 - `configs/`: Replica, NARUTO, and runtime configurations.
 - `scripts/`: installation and launch helpers.
 - `envs/`: dependency lists and Docker environment material.
-- `run_*.sh`, `test_*.sh`: focused stage-one run and unit-test entry points.
-- `analysis_*.py`, `offline_*.py`, `notes_*.txt`: offline analysis and research
-  records for the planner extension.
+- [`experiments/`](experiments/README.md): online and offline research launchers,
+  analysis programs, and historical experiment records.
+- `tests/`: Python contracts and shell-based Qwen planner checks.
+- `docs/guides/`: baseline and visualization guides.
+- [`PROJECT_MAP.md`](PROJECT_MAP.md): concise repository navigation for
+  contributors and AI assistants.
 
 ## Reproducibility Scope
 

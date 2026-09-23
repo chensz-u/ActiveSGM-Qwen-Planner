@@ -3,7 +3,7 @@ Branch: feature_qwen25_15b_planner_v1
 Base ActiveSGM environment: activegamer
 Qwen dependency source: pinned reproducibility environment
 Model: configured by QWEN_PLANNER_MODEL_PATH
-Script: test_qwen_planner_json_v2.sh
+Script: tests/shell/test_qwen_planner_json_v2.sh
 
 Purpose:
 Test whether Qwen2.5-1.5B-Instruct can load locally and return valid JSON for next-best-view candidate selection.

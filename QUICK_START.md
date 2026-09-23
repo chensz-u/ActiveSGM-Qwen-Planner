@@ -80,6 +80,8 @@ bash scripts/repro/smoke_office0.sh
 
 该脚本固定 `ACTIVE_SGM_LLM_APPLY=0`，不会让未经验证的 Qwen 决策直接替换 ActiveSGM 轨迹。
 
+以上是当前支持的安装与 20 步冒烟路径。历史完整实验及其 Slurm 启动脚本见 [experiments/README.md](experiments/README.md)；这些启动脚本不属于上述冒烟验证流程。
+
 ## 6. 发布前检查
 
 ```bash

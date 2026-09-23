@@ -2,7 +2,7 @@ JobID: 474606
 Branch: feature_qwen25_15b_planner_v1
 Commit: 324919a3 feat: add fake LLM reranker interface
 Config: configs/Replica/office0/ActiveSem_LLMLog.py
-Script: run_office0_fake_llm_full_night.sh
+Script: experiments/launchers/online/run_office0_fake_llm_full_night.sh
 Result dir: results/Replica/office0/ActiveSem/run_fake_llm_full_night_20260526_140049
 
 Purpose:

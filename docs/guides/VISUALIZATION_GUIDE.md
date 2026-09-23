@@ -16,9 +16,9 @@ bash scripts/visualization/run_visualization.sh [scene] [exp] [gpus] [enable_vis
 **参数说明：**
 - `scene`: 场景名称，默认 `office0`
   - 可选值: `office0`, `office1`, `office2`, `office3`, `office4`, `room_0`, `apartment_0` 等
-- `exp`: 实验配置，默认 `ActiveSem`
+- `exp`: 实验配置，默认 `ActiveSem4060Vis`
   - 可选值: `ActiveSem`, `ActiveGS`, `ActiveLang`, `predefine`, `sgsslam` 等
-- `gpus`: GPU 设备 ID，默认 `0,1`
+- `gpus`: GPU 设备 ID，默认 `0`
   - 示例: `0` (单 GPU), `0,1` (双 GPU)
 - `enable_vis`: 启用可视化，默认 `1`
   - `1` = 启用可视化窗口

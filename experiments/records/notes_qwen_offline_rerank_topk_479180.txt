@@ -1,7 +1,7 @@
 JobID: 479180
 Branch: feature_qwen25_15b_planner_v1
-Script: run_offline_qwen_rerank_topk.sh
-Python script: offline_qwen_rerank_llm_logs_topk.py
+Script: experiments/launchers/offline/run_offline_qwen_rerank_topk.sh
+Python script: experiments/analysis/offline_qwen_rerank_llm_logs_topk.py
 Model: configured by QWEN_PLANNER_MODEL_PATH
 Qwen dependency source: pinned reproducibility environment
 Input log: results/Replica/office0/ActiveSem/run_fake_llm_full_night_20260526_140049/splatam/llm_logs/planner_semantic_candidates.jsonl
