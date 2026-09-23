@@ -1,6 +1,9 @@
+import os
 import re
 import shutil
 import subprocess
+import sys
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -92,6 +95,50 @@ class PersonalPathContractTests(unittest.TestCase):
 
 
 class RepositoryLayoutTests(unittest.TestCase):
+    def test_offline_analysis_scripts_import_from_unrelated_directory(self):
+        probe = """
+import importlib.util
+import os
+import sys
+import types
+from pathlib import Path
+
+script = Path(sys.argv[1])
+root = script.parents[2]
+assert str(root) not in sys.path
+sys.modules["torch"] = types.ModuleType("torch")
+transformers = types.ModuleType("transformers")
+transformers.AutoTokenizer = object()
+transformers.AutoModelForCausalLM = object()
+sys.modules["transformers"] = transformers
+spec = importlib.util.spec_from_file_location(script.stem, script)
+module = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(module)
+assert module.MODEL_PATH == os.environ["QWEN_PLANNER_MODEL_PATH"]
+assert Path(module.resolve_qwen_model_path.__code__.co_filename).resolve() == root / "src/llm/runtime_paths.py"
+"""
+        scripts = (
+            ROOT / "experiments/analysis/offline_qwen_rerank_llm_logs_topk.py",
+            ROOT / "experiments/analysis/offline_qwen_tiebreak_top3.py",
+        )
+        with tempfile.TemporaryDirectory() as temporary:
+            model_dir = Path(temporary) / "model"
+            model_dir.mkdir()
+            environment = os.environ.copy()
+            environment.pop("PYTHONPATH", None)
+            environment["QWEN_PLANNER_MODEL_PATH"] = str(model_dir)
+            for script in scripts:
+                with self.subTest(script=script.name):
+                    result = subprocess.run(
+                        [sys.executable, "-I", "-c", probe, str(script)],
+                        cwd=temporary,
+                        env=environment,
+                        capture_output=True,
+                        text=True,
+                        check=False,
+                    )
+                    self.assertEqual(0, result.returncode, msg=result.stderr)
+
     def test_moved_shell_entry_points_resolve_repository_root(self):
         expectations = {
             ROOT / "experiments/launchers/online": 'REPO_ROOT="$(cd -- "${SCRIPT_DIR}/../../.." && pwd)"',
